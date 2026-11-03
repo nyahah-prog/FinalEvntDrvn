@@ -1,0 +1,5 @@
+<footer class="site-footer container">
+  <span>{{appTitle}}</span><span>&copy; {{year}} SupplyHub</span>
+</footer>
+</body>
+</html>

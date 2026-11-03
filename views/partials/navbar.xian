@@ -1,0 +1,17 @@
+<header class="site-header">
+  <nav class="nav container" aria-label="Main navigation">
+    <a class="brand" href="/"><span class="brand-mark">S</span>SupplyHub</a>
+    <div class="nav-links">
+      {{#if currentUser}}
+        <a href="/dashboard">Dashboard</a>
+        <span class="user-label">{{currentUser.name}}</span>
+        <form action="/logout" method="post" class="inline-form">
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+          <button class="button button-secondary" type="submit">Sign out</button>
+        </form>
+      {{else}}
+        <a href="/login">Sign in</a><a class="button" href="/register">Create account</a>
+      {{/if}}
+    </div>
+  </nav>
+</header>
