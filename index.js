@@ -33,6 +33,14 @@ for (const name of fs.readdirSync(path.join(root, "views/partials"))) {
     name.slice(0, -5), fs.readFileSync(path.join(root, "views/partials", name), "utf8")
   );
 }
+hbs.registerPartial(
+  "finance-head",
+  fs.readFileSync(path.join(root, "views/Finance SupplyHub/head.xian"), "utf8")
+);
+hbs.registerPartial(
+  "finance-side",
+  fs.readFileSync(path.join(root, "views/Finance SupplyHub/side.xian"), "utf8")
+);
 app.use(express.static(path.join(root, "public")));
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: false, limit: "1mb" }));

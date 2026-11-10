@@ -1,13 +1,64 @@
-{{> head}}
-{{> navbar}}
-<main class="container">
-  <a class="back-link" href="/dashboard">Back to dashboard</a>
-  <header class="page-header"><span class="eyebrow">SupplyHub module</span>
-    <h1>{{moduleName}}</h1><p>{{moduleDescription}}</p></header>
-  <section class="panel"><span class="badge">Editable starter</span>
-    <h2>Module workspace</h2>
-    <p>This page is connected to its own route and controller. Build your assigned features in this module.</p>
-    <p class="muted">The business features and business database tables are for your team to implement.</p>
-  </section>
-</main>
-{{> footer}}
+{{> finance-head}}
+{{> finance-side}}
+    <main class="finance-content">
+      {{> messages}}
+      {{#if isDemoData}}<p class="finance-demo-note">Showing <strong>sample data</strong> — record a transaction to start tracking real figures.</p>{{/if}}
+      <section class="finance-summary" aria-label="Financial summary">
+        <article class="stat-card">
+          <span class="stat-icon income">↗</span>
+          <div><span>Total income</span><strong>{{totalIncome}}</strong><small>{{paidCount}} completed · {{monthLabel}}</small></div>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon collected">✓</span>
+          <div><span>Collected</span><strong>{{collectedAmount}}</strong><small>Received payments</small></div>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon pending">◷</span>
+          <div><span>Pending amount</span><strong>{{pendingAmount}}</strong><small>{{pendingCount}} awaiting settlement</small></div>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon balance">▤</span>
+          <div><span>Transactions</span><strong>{{transactionCount}}</strong><small>Income records this month</small></div>
+        </article>
+      </section>
+      <section class="finance-panel finance-chart-panel">
+        <div class="panel-heading">
+          <div><h2>Income overview</h2><p>Income received throughout {{monthLabel}}</p></div>
+          <div class="chart-legend"><span><i class="income-dot"></i>Income</span></div>
+        </div>
+        <div class="chart-balance"><strong>{{totalIncome}}</strong><span>Total income · {{monthLabel}}</span></div>
+        <div class="finance-chart">{{#each cashFlowChart}}<div class="chart-column" title="{{label}}: {{incomeDisplay}} income"><div class="chart-bars"><span class="chart-bar income-bar" style="height: {{incomeHeight}}%"></span></div><small>{{label}}</small></div>{{else}}<div class="chart-empty">No income activity in this period.</div>{{/each}}</div>
+      </section>
+      <section class="finance-panel finance-table-panel" id="transactions">
+        <div class="finance-table-heading">
+          <div><h2>Transactions</h2><p>Your latest store activity, all in one place.</p></div>
+          <a class="finance-export-button" href="/finance/export.csv?month={{selectedMonth}}">
+            <svg aria-hidden="true" viewBox="0 0 20 20" fill="none"><path d="M10 3.5v8m0 0 3-3m-3 3-3-3M4.5 13v3h11v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Export
+          </a>
+        </div>
+        <div class="finance-filter-row"><form method="get" action="/finance" class="finance-filter"><input type="hidden" name="month" value="{{filters.month}}"><input type="hidden" name="search" value="{{filters.search}}"><select name="status"><option value="">All statuses</option><option value="paid" {{#if filterStatusPaid}}selected{{/if}}>Completed</option><option value="pending" {{#if filterStatusPending}}selected{{/if}}>Pending</option><option value="cancelled" {{#if filterStatusCancelled}}selected{{/if}}>Cancelled</option></select><input type="date" name="from" value="{{filters.from}}" aria-label="From date"><input type="date" name="to" value="{{filters.to}}" aria-label="To date"><button type="submit">Apply</button>{{#if hasFilters}}<a href="/finance">Clear</a>{{/if}}</form></div>
+        <div class="table-wrap"><table class="finance-table"><thead><tr><th>Transaction</th><th>Date</th><th>Payment method</th><th>Status</th><th>Amount</th><th></th></tr></thead><tbody>
+          {{#each transactions}}
+          <tr><td><strong>{{category}}</strong><small>{{referenceNo}} · {{description}}</small></td><td>{{shortDate}}</td><td>{{paymentMethodDisplay}}</td><td><span class="status status-{{status}}">{{statusLabel}}</span></td><td class="amount">{{amountSign}}{{amountDisplay}}</td><td class="actions">{{#if isDemo}}<span class="table-demo-badge">Sample</span>{{else}}<button class="table-button" type="button" data-edit-transaction data-id="{{id}}" data-reference="{{referenceNo}}" data-category="{{category}}" data-description="{{description}}" data-amount="{{amount}}" data-date="{{transactionDate}}" data-status="{{status}}" data-payment="{{paymentMethod}}">Edit</button><form method="post" action="/finance/transactions/{{id}}/delete" onsubmit="return confirm('Delete this finance transaction?')"><input type="hidden" name="_csrf" value="{{../csrfToken}}"><button class="table-button danger" type="submit">Delete</button></form>{{/if}}</td></tr>
+          {{else}}<tr><td colspan="6" class="empty-state">No income records match this view.</td></tr>{{/each}}
+        </tbody></table></div>
+      </section>
+      <dialog id="new-transaction-modal" class="finance-modal">
+        <form method="post" action="/finance/transactions" class="finance-form"><input type="hidden" name="_csrf" value="{{csrfToken}}"><div class="modal-heading"><div><span class="finance-kicker">Finance SupplyHub</span><h2>Record transaction</h2></div><button class="modal-close" type="button" data-close-modal aria-label="Close">&times;</button></div>
+          <div class="finance-form-grid"><label>Date<input type="date" name="transactionDate" value="{{defaultDate}}" required></label><label>Category<input name="category" maxlength="80" required placeholder="Sales, services, rentals"></label><label>Amount<input type="number" name="amount" min="0.01" step="0.01" required></label><label>Status<select name="status"><option value="paid">Completed</option><option value="pending">Pending</option><option value="cancelled">Cancelled</option></select></label><label>Payment method<select name="paymentMethod"><option value="cash">Cash</option><option value="bank">Bank transfer</option><option value="card">Card</option><option value="mobile">E-wallet</option><option value="other">Other</option></select></label><label class="full-field">Description<input name="description" maxlength="255" placeholder="Optional notes"></label></div>
+          <div class="modal-actions"><button class="finance-button secondary" type="button" data-close-modal>Cancel</button><button class="finance-button primary" type="submit">Save transaction</button></div>
+        </form>
+      </dialog>
+      <dialog id="edit-modal" class="finance-modal">
+        <form id="edit-form" method="post" action="/finance/transactions" class="finance-form"><input type="hidden" name="_csrf" value="{{csrfToken}}"><input type="hidden" id="edit-id" name="id" value=""><div class="modal-heading"><div><span class="finance-kicker">Edit transaction</span><h2 id="edit-reference"></h2></div><button class="modal-close" type="button" data-close-modal aria-label="Close">&times;</button></div>
+          <div class="finance-form-grid"><label>Date<input id="edit-date" type="date" name="transactionDate" required></label><label>Category<input id="edit-category" name="category" maxlength="80" required></label><label>Amount<input id="edit-amount" type="number" name="amount" min="0.01" step="0.01" required></label><label>Status<select id="edit-status" name="status" required><option value="paid">Completed</option><option value="pending">Pending</option><option value="cancelled">Cancelled</option></select></label><label>Payment method<select id="edit-payment" name="paymentMethod" required><option value="cash">Cash</option><option value="bank">Bank transfer</option><option value="card">Card</option><option value="mobile">E-wallet</option><option value="other">Other</option></select></label><label class="full-field">Description<input id="edit-description" name="description" maxlength="255"></label></div>
+          <div class="modal-actions"><button class="finance-button secondary" type="button" data-close-modal>Cancel</button><button class="finance-button primary" type="submit">Update transaction</button></div>
+        </form>
+      </dialog>
+    </main>
+  </div>
+</div>
+<script src="/js/Finance SupplyHub/ui.js" defer></script>
+</body>
+</html>

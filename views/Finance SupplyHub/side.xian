@@ -1,0 +1,57 @@
+<div class="finance-app-shell">
+  <aside class="finance-sidebar">
+    <a class="finance-brand" href="/finance" aria-label="Finance SupplyHub home">
+      <span class="finance-brand-mark">S</span>
+      <span class="finance-brand-copy"><strong>SupplyHub.</strong><small>FINANCE MODULE</small></span>
+    </a>
+    <nav class="finance-nav" aria-label="Finance navigation">
+      <span class="finance-nav-label">Menu</span>
+      <a class="active" href="/finance?month={{selectedMonth}}">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1v-9.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        <span>Overview</span>
+      </a>
+      <a href="/finance?month={{selectedMonth}}#transactions">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M8.5 7h11m-11 5h11m-11 5h11M4.5 7h.01m-.01 5h.01m-.01 5h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <span>Payment records</span>
+      </a>
+      <a class="finance-nav-export" href="/finance/export.csv?month={{selectedMonth}}">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 17v2.5h14V17" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Export report</span>
+      </a>
+    </nav>
+    <div class="finance-sidebar-foot">
+      <div class="finance-account">
+        <div class="finance-avatar">{{currentUser.name}}</div>
+        <div class="finance-account-copy"><strong>{{currentUser.name}}</strong><span>Finance</span></div>
+      </div>
+      <form action="/logout" method="post" class="finance-logout-form">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <button type="submit">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M14 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2m-6-6h11m0 0-3-3m3 3-3 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Log out</span>
+        </button>
+      </form>
+    </div>
+  </aside>
+  <div class="finance-workspace">
+    <header class="finance-topbar">
+      <button class="finance-menu-button" type="button" aria-label="Toggle navigation" onclick="document.querySelector('.finance-sidebar').classList.toggle('is-open')">☰</button>
+      <form class="finance-topbar-search" method="get" action="/finance" role="search">
+        <input type="hidden" name="month" value="{{filters.month}}">
+        <input type="hidden" name="status" value="{{filters.status}}">
+        <input type="hidden" name="from" value="{{filters.from}}">
+        <input type="hidden" name="to" value="{{filters.to}}">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.7"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <input type="search" name="search" value="{{filters.search}}" placeholder="Search transactions" aria-label="Search transactions">
+      </form>
+      <div class="finance-topbar-actions">
+        <form method="get" action="/finance" class="finance-month-filter">
+          <input type="hidden" name="status" value="{{filters.status}}">
+          <input type="hidden" name="search" value="{{filters.search}}">
+          <input type="hidden" name="from" value="{{filters.from}}">
+          <input type="hidden" name="to" value="{{filters.to}}">
+          <input class="finance-month-input" type="month" name="month" value="{{selectedMonth}}" aria-label="Choose month" onchange="this.form.submit()" required>
+        </form>
+        <button class="finance-button primary" id="new-transaction-button" type="button">+ Add transaction</button>
+      </div>
+    </header>
