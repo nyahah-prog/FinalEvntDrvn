@@ -1,0 +1,6 @@
+{{> head}}
+{{> navbar}}
+<main class="container"><section class="panel page-header">
+  <h1>{{title}}</h1><p>{{message}}</p><a class="button" href="/">Return home</a>
+</section></main>
+{{> footer}}

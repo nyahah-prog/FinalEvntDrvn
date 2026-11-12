@@ -1,0 +1,244 @@
+{{> head}}
+  <div class="flex h-screen">
+    <main class="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <nav class="flex h-16 shrink-0 items-center border-b border-white/10 bg-[#08131e] px-6">
+        <button type="button" data-keyboard-back="/dashboard" aria-keyshortcuts="Escape" class="mr-3 rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300 hover:bg-white/5" aria-label="Go back to dashboard (Escape)">← Back</button>
+        <a href="/pos" aria-label="POS dashboard" data-keyboard-back="/dashboard" class="mr-7 flex h-9 w-9 items-center justify-center rounded-lg bg-[#0d1b27] border border-white/5">S</a>
+
+        <div class="flex items-center gap-1 text-sm">
+          <a href="/dashboard" class="rounded-lg px-4 py-2 text-slate-400 hover:bg-white/5 hover:text-white transition">Dashboard</a>
+          <a href="/pos/products" class="rounded-lg bg-white px-4 py-2 font-semibold text-slate-900">Products</a>
+          <a href="/pos/reports" data-shortcut-f3 aria-keyshortcuts="F3" class="rounded-lg px-4 py-2 text-slate-400 hover:bg-white/5 hover:text-white transition">Reports (F3)</a>
+        </div>
+        <span class="pos-shortcut-hint">Tab/Enter Navigate · F2 Search · F3 Reports · F4 Checkout · F5 Products · F6 Scan · F7 Receipt · F8 Clear · F9 Discount · F10 Payment · Esc Back</span>
+
+      </nav>
+
+      <header class="pos-terminal-header flex shrink-0 items-end justify-between border-b border-white/10 px-10 py-7">
+        <div>
+          {{#if isPosDashboard}}
+          <h1 class="text-3xl font-semibold tracking-tight text-white">POS Dashboard</h1>
+          <p class="mt-1 text-sm text-slate-500">Products, cart, checkout, and reports are ready here.</p>
+          {{else}}
+          <h1 class="text-3xl font-semibold tracking-tight text-white">Products</h1>
+          <p class="mt-1 text-sm text-slate-500">Manage the products and checkout order</p>
+          {{/if}}
+        </div>
+
+        <div class="flex items-stretch divide-x divide-white/10">
+          <div class="min-w-32 px-6">
+            <p class="text-xs text-slate-500">Cart total</p>
+            <p class="mt-1 text-xl font-semibold text-white">₱{{totalAmount}}</p>
+          </div>
+          <div class="min-w-32 px-6">
+            <p class="text-xs text-slate-500">Products</p>
+            <p class="mt-1 text-xl font-semibold text-white">{{products.length}}</p>
+          </div>
+        </div>
+      </header>
+
+      <section class="pos-terminal-layout grid min-h-0 flex-1 grid-cols-12 gap-5 overflow-hidden p-6">
+        <aside class="pos-checkout-panel col-span-12 flex min-h-0 flex-col overflow-y-auto rounded-2xl border border-white/10 bg-[#0b1722] lg:col-span-3">
+          <div class="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4">
+            <div class="flex items-center gap-3">
+              <div class="flex h-9 w-9 items-center justify-center rounded-full bg-white text-sm font-bold text-slate-900"></div>
+              <div>
+                <p class="text-sm font-medium text-white">Walking Customer</p>
+                <p class="text-xs text-slate-500">Current order</p>
+              </div>
+            </div>
+            <form action="/pos/cart/clear" method="POST" onsubmit="return confirm('Clear all items and discounts from this order?')">
+              <input type="hidden" name="_csrf" value="{{csrfToken}}">
+              <button type="submit" data-shortcut-clear aria-keyshortcuts="F8" class="rounded-lg border border-red-400/20 px-3 py-2 text-xs font-medium text-red-300 hover:bg-red-400/10">Clear Order</button>
+            </form>
+          </div>
+
+          {{#if checkoutError}}
+          <p role="alert" class="shrink-0 border-b border-red-400/20 bg-red-400/10 px-5 py-3 text-xs text-red-200">{{checkoutError}}</p>
+          {{/if}}
+
+          <div class="pos-cart-items shrink-0 px-5 py-4">
+            <div class="grid grid-cols-[1fr_94px_60px_30px] border-b border-white/10 pb-3 text-xs font-medium text-slate-500">
+              <span>Name</span>
+              <span class="pos-quantity-heading text-center">Quantity</span>
+              <span class="text-right">Price</span>
+              <span></span>
+            </div>
+
+            {{#if cart.length}}
+              {{#each cart}}
+              <div class="grid grid-cols-[1fr_94px_60px_30px] items-center border-b border-white/[0.06] py-4 text-sm">
+                <span class="truncate font-medium text-slate-200">{{this.name}}</span>
+                <div class="flex items-center justify-center gap-1">
+                  <form action="/pos/cart/decrease/{{this.id}}" method="POST">
+                    <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
+                    <button type="submit" aria-keyshortcuts="Enter" title="Press Enter to decrease quantity" class="flex h-7 w-6 items-center justify-center rounded-md bg-[#152431] text-slate-300 hover:bg-[#1d3040]" aria-label="Decrease quantity">-</button>
+                  </form>
+                  <form action="/pos/cart/quantity/{{this.id}}" method="POST" class="flex items-center gap-1">
+                    <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
+                    <input type="number" name="quantity" min="1" step="1" value="{{this.quantity}}" data-quantity-input aria-label="Set quantity for {{this.name}}" class="w-10 rounded-md border border-white/10 bg-[#07111b] px-1 py-1 text-center text-xs text-white">
+                    <button type="submit" class="sr-only">Set quantity</button>
+                  </form>
+                  <form action="/pos/cart/increase/{{this.id}}" method="POST">
+                    <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
+                    <button type="submit" aria-keyshortcuts="Enter" title="Press Enter to increase quantity" class="flex h-7 w-6 items-center justify-center rounded-md bg-[#152431] text-slate-300 hover:bg-[#1d3040]" aria-label="Increase quantity">+</button>
+                  </form>
+                </div>
+                <span class="text-right text-xs font-semibold text-white">₱{{this.price}}</span>
+                <form action="/pos/cart/remove/{{this.id}}" method="POST">
+                  <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
+                  <button type="submit" class="flex h-7 w-7 items-center justify-center rounded-md text-red-300 hover:bg-red-400/10" aria-label="Remove {{this.name}} from order" title="Remove item">×</button>
+                </form>
+              </div>
+              {{/each}}
+            {{else}}
+              <p class="py-10 text-center text-sm text-slate-500">No items in the order.</p>
+            {{/if}}
+          </div>
+
+          <div class="pos-checkout-summary shrink-0 border-t border-white/10 p-5">
+            <div class="space-y-2 text-sm text-slate-400">
+              <div class="flex justify-between"><span>Subtotal</span><span class="text-slate-200">₱{{subtotal}}</span></div>
+              <form action="/pos/apply-discount" method="POST" class="pos-discount-form my-3 flex items-center gap-2">
+                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                <div class="pos-discount-type">
+                  <label for="discountType">Discount</label>
+                  <select id="discountType" name="discountType" aria-keyshortcuts="F9" class="rounded-xl border border-slate-700 bg-slate-800 px-2 py-1.5 text-xs text-white focus:border-indigo-500 focus:outline-none">
+                    <option value="amount" {{#if discountIsAmount}}selected{{/if}}>Amount (₱)</option>
+                    <option value="percent" {{#if discountIsPercent}}selected{{/if}}>Percent (%)</option>
+                  </select>
+                </div>
+                <label for="discountValue" class="sr-only">Discount amount or percentage</label>
+                <input id="discountValue" type="number" name="discountValue" min="0" step="0.01" value="{{discountValue}}" placeholder="Discount" class="min-w-0 w-full bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500">
+                <button type="submit" class="pos-discount-apply shrink-0 rounded-xl px-3 py-1.5 text-xs text-white transition">Apply</button>
+              </form>
+              <div class="flex justify-between"><span>Discount</span><span class="text-slate-300">-₱{{discountAmount}}</span></div>
+              <div class="flex justify-between border-t border-white/10 pt-3 text-base font-semibold text-white">
+                <span>Total Amount</span><span>₱{{totalAmount}}</span>
+              </div>
+            </div>
+            <form id="checkout-form" data-shortcut-submit action="/pos/checkout" method="POST" class="mt-4 space-y-3">
+              <input type="hidden" name="_csrf" value="{{csrfToken}}">
+              <label for="customerId" class="block text-xs text-slate-400">Customer</label>
+              <select id="customerId" name="customerId" class="w-full rounded-lg border border-white/10 bg-[#07111b] px-3 py-2 text-sm text-white">
+                <option value="">Walking Customer</option>
+                {{#each customers}}
+                <option value="{{this.id}}">{{this.name}} ({{this.email}})</option>
+                {{/each}}
+              </select>
+
+              <label for="paymentMethod" class="block text-xs text-slate-400">Payment method</label>
+              <select id="paymentMethod" name="paymentMethod" required aria-keyshortcuts="F10" class="w-full rounded-lg border border-white/10 bg-[#07111b] px-3 py-2 text-sm text-white">
+                <option value="cash">Cash</option>
+                <option value="gcash">GCash</option>
+                <option value="maya">Maya</option>
+                <option value="credit-card">Credit Card</option>
+              </select>
+              <div id="cash-payment-fields" class="space-y-2">
+                <label for="amountTendered" class="block text-xs text-slate-400">Amount tendered (₱)</label>
+                <input id="amountTendered" name="amountTendered" type="number" min="{{totalAmount}}" step="0.01" value="{{totalAmount}}" data-order-total="{{totalAmount}}" class="w-full rounded-lg border border-white/10 bg-[#07111b] px-3 py-2 text-sm text-white">
+                <p class="flex justify-between text-xs text-slate-400"><span>Change</span><strong id="change-amount" class="text-white">₱0.00</strong></p>
+              </div>
+            </form>
+            <p class="mt-3 text-[11px] text-slate-500">Printer status: Browser-managed; connection status is unavailable here.</p>
+          </div>
+          <div class="pos-checkout-actions sticky bottom-0 z-10 mt-auto flex shrink-0 gap-2 border-t border-white/10 bg-[#0b1722] p-4">
+            <button type="button" data-receipt-open aria-keyshortcuts="F7" class="flex-1 rounded-xl border border-white/10 py-3 text-xs font-medium text-slate-200 hover:bg-white/5">Receipt / Print (F7)</button>
+            <button type="submit" form="checkout-form" aria-keyshortcuts="F4" {{#unless cart.length}}disabled{{/unless}} class="flex-[2] rounded-xl bg-[#b6ef59] py-3 text-sm font-semibold text-[#101a12] transition hover:bg-[#c7f779] disabled:cursor-not-allowed disabled:opacity-40">Process Checkout (F4)</button>
+          </div>
+        </aside>
+
+        <div class="pos-catalog col-span-12 min-h-0 overflow-y-auto lg:col-span-9">
+          <div class="mb-5 flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold text-white">Product Catalog</h2>
+            </div>
+            <a href="/pos/product-management" data-shortcut-f5 aria-keyshortcuts="F5" class="rounded-lg border border-white/10 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-white/5">Manage Products (F5)</a>
+          </div>
+
+          <div class="mb-5 grid grid-cols-1 gap-3 rounded-2xl border border-white/10 bg-[#0b1722] p-4 sm:grid-cols-2">
+            <form action="/pos/cart/scan" method="POST">
+              <input type="hidden" name="_csrf" value="{{csrfToken}}">
+              <input id="barcode-input" data-shortcut-scan aria-keyshortcuts="F6" type="text" name="barcode" autocomplete="off" required aria-label="Scan product barcode (F6)" placeholder="Scan barcode (F6), then Enter" class="w-full rounded-xl border border-white/10 bg-[#07111b] px-4 py-3 text-sm text-slate-200 outline-none placeholder:text-slate-500 focus:border-[#b6ef59]/60">
+            </form>
+            <form action="/pos/products" method="GET">
+              <input id="search-input" data-shortcut-search aria-keyshortcuts="F2" type="text" name="search" value="{{searchQuery}}" placeholder="Search products (F2), then Enter" aria-label="Search products by name or code (F2)" class="w-full rounded-xl border border-white/10 bg-[#07111b] px-4 py-3 text-sm text-slate-200 outline-none placeholder:text-slate-500 focus:border-[#b6ef59]/60">
+            </form>
+          </div>
+
+          {{#if searchQuery}}
+          <p class="mb-4 text-xs text-slate-400" role="status">Search results for "{{searchQuery}}". Use Tab to select a product and press Enter to add it.</p>
+          {{/if}}
+          <p class="sr-only" data-shortcut-status role="status" aria-live="polite"></p>
+
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {{#each products}}
+            <article data-catalog-item data-name="{{this.name}}" data-sku="{{this.sku}}" class="flex min-h-52 flex-col justify-between rounded-2xl border border-white/10 bg-[#0b1722] p-4 transition hover:border-white/20">
+              <div>
+                <div class="mb-4 flex h-28 items-center justify-center rounded-xl border border-white/[0.06] bg-[#07111b] text-xs text-slate-500">No Image Available</div>
+                <h3 class="truncate font-semibold text-white">{{this.name}}</h3>
+                <p class="mt-1 text-xs text-slate-500">SKU: {{this.sku}}</p>
+              </div>
+
+              <div class="mt-4 flex items-center justify-between border-t border-white/[0.07] pt-4">
+                <div>
+                  <p class="text-xs text-slate-500">Stock: {{this.stock}}</p>
+                  <p class="mt-1 font-semibold text-white">₱{{this.price}}</p>
+                </div>
+                <form action="/pos/cart/add/{{this.id}}" method="POST">
+                  <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
+                  <button type="submit" data-search-result aria-label="Add {{this.name}} to order" title="Add {{this.name}} to order" class="rounded-lg bg-[#b6ef59] px-4 py-2 text-sm font-semibold text-[#101a12] hover:bg-[#c7f779] transition">Add</button>
+                </form>
+              </div>
+            </article>
+            {{/each}}
+          </div>
+        </div>
+      </section>
+
+      <dialog data-receipt-dialog class="w-[360px] max-w-[90vw] rounded-xl border border-white/10 bg-white p-0 text-slate-900 shadow-2xl backdrop:bg-black/70">
+        <div class="p-6 font-mono text-sm">
+          <div class="text-center">
+            <h2 class="text-lg font-bold">POS SupplyHub</h2>
+            <p class="mt-1 text-xs">SALES RECEIPT PREVIEW</p>
+            <p class="mt-3 border-t border-dashed border-slate-400 pt-2 text-left">Customer: <span data-receipt-customer>Walking Customer</span></p>
+            <p class="text-left">Date: <span data-receipt-date></span></p>
+          </div>
+          <div class="my-3 border-t border-dashed border-slate-400 pt-2">
+            {{#each cart}}
+            <div class="flex justify-between gap-2 py-1">
+              <span class="min-w-0 flex-1">{{this.name}} × {{this.quantity}}</span>
+              <span>₱{{this.price}}</span>
+            </div>
+            {{/each}}
+          </div>
+          <div class="flex justify-between border-t border-dashed border-slate-400 pt-2 font-bold">
+            <span>TOTAL</span><span>₱{{totalAmount}}</span>
+          </div>
+          <p class="mt-4 text-center text-xs">Thank you for shopping!</p>
+          <div class="receipt-actions mt-5 flex gap-2 font-sans">
+            <button type="button" data-receipt-close class="flex-1 rounded-lg border border-slate-300 px-3 py-2">Close</button>
+            <button type="button" data-receipt-print class="flex-1 rounded-lg bg-slate-900 px-3 py-2 text-white">Print</button>
+          </div>
+        </div>
+      </dialog>
+    </main>
+  </div>
+  <style>
+    @media print {
+      body * { visibility: hidden !important; }
+      [data-receipt-dialog][open],
+      [data-receipt-dialog][open] * { visibility: visible !important; }
+      [data-receipt-dialog][open] {
+        position: fixed;
+        inset: 0 auto auto 0;
+        width: 80mm;
+        max-width: 80mm;
+        margin: 0;
+        border: 0;
+        box-shadow: none;
+      }
+      .receipt-actions { display: none !important; }
+    }
+  </style>
+{{> footer}}

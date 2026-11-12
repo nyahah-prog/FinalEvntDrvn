@@ -1,0 +1,25 @@
+{{> head}}
+{{> navbar}}
+<main class="container">
+  <section class="hero"><span class="eyebrow">One store. Four connected teams.</span>
+    {{#if currentUser}}
+      <h1>Welcome, {{currentUser.name}}</h1>
+      <p>Your workspace is ready. Open your dashboard to continue.</p>
+      <a class="button" href="/dashboard">Go to Dashboard</a>
+    {{else}}
+      <h1>{{appTitle}}</h1>
+      <p>An editable starting point for Finance, POS, Inventory, and Human Resource.</p>
+      <a class="button" href="/login">Open your workspace</a>
+    {{/if}}
+  </section>
+  {{#unless currentUser}}
+  <section class="module-grid" aria-label="System modules">
+    {{#each modules}}
+    <article class="module-card"><span class="badge">Module</span>
+      <h2>{{name}}</h2><p>{{description}}</p>
+      <a class="text-link" href="{{path}}">Open module &rarr;</a></article>
+    {{/each}}
+  </section>
+  {{/unless}}
+</main>
+{{> footer}}

@@ -1,0 +1,13 @@
+{{> head}}
+{{> navbar}}
+<main class="container">
+  <a class="back-link" href="/dashboard">Back to dashboard</a>
+  <header class="page-header"><span class="eyebrow">SupplyHub module</span>
+    <h1>{{moduleName}}</h1><p>{{moduleDescription}}</p></header>
+  <section class="panel"><span class="badge">Editable starter</span>
+    <h2>Module workspace</h2>
+    <p>This page is connected to its own route and controller. Build your assigned features in this module.</p>
+    <p class="muted">The business features and business database tables are for your team to implement.</p>
+  </section>
+</main>
+{{> footer}}

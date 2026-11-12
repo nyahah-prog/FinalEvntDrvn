@@ -1,0 +1,28 @@
+import express from "express";
+import { homePage, dashboardPage } from "../controllers/homeController.js";
+import { loginPage, loginUser, registerPage, registerUser, logoutUser, forgotPasswordPage } from "../controllers/authController.js";
+import { requireAuth } from "../middleware/authMiddleware.js";
+import financeControllerRoutes from "./Finance SupplyHub/index.js";
+import posControllerRoutes from "./POS SupplyHub/index.js";
+import inventoryControllerRoutes from "./Inventory SupplyHub/index.js";
+import humanResourceControllerRoutes from "./Human Resource SupplyHub/index.js";
+const router = express.Router();
+router.get("/", homePage);
+router.get("/health", (req, res) => res.json({ success: true, system: "SupplyHub" }));
+router.get("/login", loginPage);
+router.post("/login", loginUser);
+router.get("/register", registerPage);
+router.post("/register", registerUser);
+router.get("/forgot-password", forgotPasswordPage);
+router.post("/logout", requireAuth, logoutUser);
+router.get("/dashboard", requireAuth, dashboardPage);
+router.get("/products", (req, res) => res.redirect("/pos/products"));
+const mount = (prefix, moduleRouter) => {
+  moduleRouter.supplyhubMount = prefix;
+  router.use(prefix, moduleRouter);
+};
+mount("/finance", financeControllerRoutes);
+mount("/pos", posControllerRoutes);
+mount("/inventory", inventoryControllerRoutes);
+mount("/human-resource", humanResourceControllerRoutes);
+export default router;

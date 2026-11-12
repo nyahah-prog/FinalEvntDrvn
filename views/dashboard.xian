@@ -1,0 +1,20 @@
+{{> head}}
+{{> navbar}}
+<main class="container">
+  <header class="page-header"><span class="eyebrow">Store workspace</span>
+    <h1>Welcome, {{currentUser.name}}</h1><p>Account role: <strong>{{currentUser.role}}</strong></p></header>
+  {{> messages}}
+  {{#if isViewer}}
+    <section class="panel"><h2>Your account is ready</h2>
+      <p>Ask your project administrator to assign your department before opening a module.</p></section>
+  {{else}}
+    <section class="module-grid" aria-label="Available modules">
+    {{#each modules}}
+      <article class="module-card"><span class="badge">Workspace</span>
+        <h2>{{name}}</h2><p>{{description}}</p>
+        <a class="text-link" href="{{path}}">Open module &rarr;</a></article>
+    {{/each}}
+    </section>
+  {{/if}}
+</main>
+{{> footer}}

@@ -1,0 +1,18 @@
+{{> head}}
+{{> navbar}}
+<main class="container auth-wrap"><section class="auth-card">
+  <span class="eyebrow">Get started</span><h1>Create account</h1>
+  <p>Your administrator will assign your department after registration.</p>
+  {{> messages}}
+  <form action="/register" method="post" class="form-stack">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <label>Full name<input name="name" value="{{name}}" minlength="2" maxlength="120" autocomplete="name" required></label>
+    <label>Email<input type="email" name="email" value="{{email}}" maxlength="191" autocomplete="username" required></label>
+    <label>Password<input type="password" name="password" minlength="8" maxlength="72" autocomplete="new-password" required></label>
+    <label>Confirm password<input type="password" name="confirmPassword" minlength="8" maxlength="72" autocomplete="new-password" required></label>
+    <small class="muted">Use at least 8 characters, up to 72 UTF-8 bytes.</small>
+    <button class="button" type="submit">Create account</button>
+  </form>
+  <p class="muted">Already registered? <a href="/login">Sign in</a></p>
+</section></main>
+{{> footer}}

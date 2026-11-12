@@ -1,0 +1,31 @@
+{{> head}}
+<main class="pos-report">
+  <nav aria-label="POS navigation">
+    <a href="/pos/products" data-keyboard-back="/pos/products" aria-keyshortcuts="Escape">← Back to POS (Esc)</a>
+    <a href="/pos">Home</a>
+    <a href="/pos/products">Products</a>
+    <a href="/pos/reports" data-shortcut-f3 aria-keyshortcuts="F3">Reports (F3)</a>
+    <a href="/pos/product-management" data-shortcut-f5 aria-keyshortcuts="F5">Manage Products (F5)</a>
+    <span class="pos-shortcut-hint">Tab/Enter Navigate · F2 Search · F3 Reports · F5 Products · F6 Scan · Esc Back</span>
+  </nav>
+  <header>
+    <h1>Sales Reports</h1>
+    <p>Total sales: ₱{{totalSales}}</p>
+  </header>
+  <section>
+    <h2>Transaction History</h2>
+    {{#if transactions.length}}
+      {{#each transactions}}
+      <article>
+        <strong>{{this.itemsSummary}}</strong>
+        <span>{{this.customerName}}</span>
+        <span>{{this.createdAt}}</span>
+        <strong>₱{{this.totalAmount}}</strong>
+      </article>
+      {{/each}}
+    {{else}}
+      <p>No completed sales yet.</p>
+    {{/if}}
+  </section>
+</main>
+{{> footer}}

@@ -1,0 +1,99 @@
+{{> head}}
+  <div class="flex min-h-screen">
+    <main class="pos-management-page flex min-w-0 flex-1 flex-col">
+      <nav class="flex h-16 shrink-0 items-center border-b border-white/10 bg-[#08131e] px-6">
+        <a href="/pos" aria-label="POS dashboard" class="mr-7 flex h-9 w-9 items-center justify-center rounded-lg border border-white/5 bg-[#0d1b27]">S</a>
+        <div class="flex items-center gap-1 text-sm">
+          <a href="/pos" class="rounded-lg px-4 py-2 text-slate-400 hover:bg-white/5 hover:text-white transition">Home</a>
+          <a href="/pos/products" class="rounded-lg px-4 py-2 text-slate-400 hover:bg-white/5 hover:text-white transition">Products</a>
+        </div>
+        <div class="ml-auto flex items-center gap-2">
+          <a href="/pos/reports" data-shortcut-f3 aria-keyshortcuts="F3" class="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-300 hover:bg-white/5">Reports (F3)</a>
+          <a href="/pos/products" data-keyboard-back="/pos/products" aria-keyshortcuts="Escape" class="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-300 hover:bg-white/5">Back to POS (Esc)</a>
+        </div>
+        <span class="pos-shortcut-hint">Tab/Enter Navigate · F2 Search · F3 Reports · F5 Focus Name · F6 Scan · Esc Back</span>
+      </nav>
+
+      <header class="pos-management-header flex shrink-0 items-end justify-between border-b border-white/10 px-10 py-7">
+        <div>
+          <h1 class="text-3xl font-semibold tracking-tight text-white">Product Management</h1>
+          <p class="mt-1 text-sm text-slate-500">Add, view, and manage inventory items</p>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-[#0b1722] px-6 py-4 min-w-44">
+          <p class="text-xs text-slate-500">Total products</p>
+          <p class="mt-1 text-2xl font-semibold text-white">{{products.length}}</p>
+        </div>
+      </header>
+
+      <section class="pos-management-content flex-1 overflow-y-auto p-6">
+        <div class="pos-product-form-card mb-6 rounded-2xl border border-white/10 bg-[#0b1722] p-5">
+          <h2 class="mb-2 text-sm font-semibold text-white">Add New Product</h2>
+          {{#if productError}}
+          <p class="mb-4 rounded-lg border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200" role="alert">{{productError}}</p>
+          {{/if}}
+          <form data-shortcut-submit action="/pos/products" method="POST" class="pos-product-form grid grid-cols-1 gap-3 md:grid-cols-5">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <label class="pos-product-field">
+              <span>Name</span>
+              <input type="text" name="name" data-shortcut-focus aria-keyshortcuts="F5" placeholder="e.g. Notebook" required maxlength="255">
+            </label>
+            <label class="pos-product-field">
+              <span>SKU</span>
+              <input type="text" name="sku" placeholder="e.g. NOTE-001" required maxlength="255">
+            </label>
+            <label class="pos-product-field">
+              <span>Price (₱)</span>
+              <input type="number" min="0" step="0.01" name="price" placeholder="0.00" required>
+            </label>
+            <label class="pos-product-field">
+              <span>Stock</span>
+              <input type="number" min="0" step="1" name="stock" placeholder="0" required>
+            </label>
+            <button type="submit" class="pos-save-product">Save Product</button>
+          </form>
+        </div>
+
+        <div class="pos-inventory-card overflow-hidden rounded-2xl border border-white/10 bg-[#0b1722]">
+          <div class="border-b border-white/10 px-6 py-4">
+            <h2 class="font-semibold text-white">Product Inventory</h2>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="pos-product-table w-full min-w-[720px] text-left">
+              <thead>
+                <tr class="border-b border-white/10 text-xs text-slate-500">
+                  <th class="px-6 py-3 font-medium">Name</th>
+                  <th class="px-6 py-3 font-medium">SKU</th>
+                  <th class="px-6 py-3 font-medium">Price</th>
+                  <th class="px-6 py-3 font-medium">Stock</th>
+                  <th class="px-6 py-3 text-right font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/[0.06] text-sm text-slate-300">
+                {{#if products.length}}
+                  {{#each products}}
+                  <tr>
+                    <td class="px-6 py-4 font-semibold text-white">{{this.name}}</td>
+                    <td class="px-6 py-4 text-slate-500">{{this.sku}}</td>
+                    <td class="px-6 py-4 font-semibold text-white">₱{{this.price}}</td>
+                    <td class="px-6 py-4">{{this.stock}}</td>
+                    <td class="px-6 py-4 text-right">
+                      <form action="/pos/products/delete/{{this.id}}" method="POST" class="inline">
+                        <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
+                        <button type="submit" class="rounded-lg border border-red-400/20 px-3 py-2 text-xs font-medium text-red-300 hover:bg-red-400/10">Delete</button>
+                      </form>
+                    </td>
+                  </tr>
+                  {{/each}}
+                {{else}}
+                  <tr>
+                    <td colspan="5" class="px-6 py-14 text-center text-slate-500">No products found.</td>
+                  </tr>
+                {{/if}}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+{{> footer}}
