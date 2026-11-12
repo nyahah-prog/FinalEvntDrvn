@@ -1,0 +1,122 @@
+
+{{> head}}
+{{> navbar}}
+
+<main class="container">
+  <header class="page-header">
+    <span class="eyebrow">SUPPLYHUB / HUMAN RESOURCE</span>
+    <h1>Edit Employee</h1>
+    <p>Update the employee's information.</p>
+  </header>
+
+  <section class="panel">
+    <div class="panel-heading">
+      <h2>Employee Information</h2>
+      <p class="muted">Update the fields below.</p>
+    </div>
+
+    <form action="/human-resource/employees/{{employee.id}}/edit" method="POST">
+      <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Employee Code *</label>
+          <input type="text" name="employeeCode" value="{{employee.employeeCode}}" required>
+        </div>
+
+        <div class="form-group">
+          <label>First Name *</label>
+          <input type="text" name="firstName" value="{{employee.firstName}}" required>
+        </div>
+
+        <div class="form-group">
+          <label>Middle Name</label>
+          <input type="text" name="middleName" value="{{employee.middleName}}">
+        </div>
+
+        <div class="form-group">
+          <label>Last Name *</label>
+          <input type="text" name="lastName" value="{{employee.lastName}}" required>
+        </div>
+
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" name="email" value="{{employee.email}}" required>
+        </div>
+
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="text" name="phone" value="{{employee.phone}}">
+        </div>
+
+        <div class="form-group">
+          <label>Position *</label>
+          <input type="text" name="position" value="{{employee.position}}" required>
+        </div>
+
+        <div class="form-group">
+          <label>Hire Date *</label>
+          <input type="date" name="hireDate" value="{{employee.hireDate}}" required>
+        </div>
+
+        <div class="form-group">
+          <label>Salary</label>
+          <input type="number" step="0.01" name="salary" value="{{employee.salary}}">
+        </div>
+
+        
+<div class="form-group">
+  <label>Department *</label>
+  <select name="departmentId" required>
+    <option value="">Select Department</option>
+    {{#each departments}}
+      <option value="{{id}}" {{#if selected}}selected{{/if}}>
+        {{departmentName}}
+      </option>
+    {{/each}}
+  </select>
+</div>
+<div class="form-group">
+  <label>Salary Effective Date</label>
+  <input type="date" name="salaryEffectiveDate">
+</div>
+
+<div class="form-group">
+  <label>Salary Change Reason</label>
+  <input type="text" name="salaryReason" placeholder="Reason for salary adjustment">
+</div>
+
+<div class="form-group">
+  <label>Status Effective Date</label>
+  <input type="date" name="statusEffectiveDate">
+</div>
+
+<div class="form-group">
+  <label>Status Change Reason</label>
+  <input type="text" name="statusReason" placeholder="Reason for employment status change">
+</div>
+
+        <div class="form-group">
+  <label>Employment Status</label>
+  <select name="employmentStatus" required>
+    <option value="active">Active</option>
+    <option value="inactive">Inactive</option>
+    <option value="resigned">Resigned</option>
+    <option value="terminated">Terminated</option>
+  </select>
+</div>
+        <div class="form-group">
+          <label>Address</label>
+          <input type="text" name="address" value="{{employee.address}}">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="/human-resource/employees" class="btn">Cancel</a>
+        <button type="submit" class="btn btn-primary">Update Employee</button>
+      </div>
+    </form>
+  </section>
+</main>
+
+{{> footer}}

@@ -1,0 +1,180 @@
+
+{{> head}}
+{{> navbar}}
+
+<main class="container">
+
+  <header class="page-header">
+    <span class="eyebrow">SUPPLYHUB / HUMAN RESOURCE</span>
+    <h1>Employee Profile</h1>
+    <p>Complete employee information and employment details.</p>
+  </header>
+
+  <section class="panel">
+
+    <div class="row">
+      <div>
+        <h2>{{employee.firstName}} {{employee.middleName}} {{employee.lastName}}</h2>
+        <p class="muted">{{employee.employeeCode}}</p>
+      </div>
+
+      <div>
+        <a href="/human-resource/employees/{{employee.id}}/edit"
+           class="btn btn-primary">Edit Profile</a>
+
+        <a href="/human-resource/employees"
+           class="btn">Back to Employees</a>
+      </div>
+    </div>
+
+    <hr>
+
+    <h2>Personal Information</h2>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Employee Code</label>
+        <p>{{employee.employeeCode}}</p>
+      </div>
+
+      <div class="form-group">
+        <label>First Name</label>
+        <p>{{employee.firstName}}</p>
+      </div>
+
+      <div class="form-group">
+        <label>Middle Name</label>
+        <p>{{employee.middleName}}</p>
+      </div>
+
+      <div class="form-group">
+        <label>Last Name</label>
+        <p>{{employee.lastName}}</p>
+      </div>
+    </div>
+
+    <hr>
+
+    <h2>Contact Information</h2>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Email Address</label>
+        <p>{{employee.email}}</p>
+      </div>
+
+      <div class="form-group">
+        <label>Phone Number</label>
+        <p>{{employee.phone}}</p>
+      </div>
+
+      <div class="form-group">
+        <label>Address</label>
+        <p>{{employee.address}}</p>
+      </div>
+    </div>
+
+    <hr>
+
+    <h2>Employment Information</h2>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Position</label>
+        <p>{{employee.position}}</p>
+      </div>
+
+      <div class="form-group">
+        <label>Department</label>
+        <p>{{employee.department.departmentName}}</p>
+      </div>
+
+      <div class="form-group">
+        <label>Date Hired</label>
+        <p>{{employee.hireDate}}</p>
+      </div>
+
+      <div class="form-group">
+        <label>Employment Status</label>
+        <p>{{employee.employmentStatus}}</p>
+      </div>
+
+      <div class="form-group">
+        <label>Salary</label>
+        <p>{{employee.salary}}</p>
+      </div>
+    </div>
+
+    <hr>
+
+    <h2>Salary History</h2>
+
+    {{#if salaryHistories.length}}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Previous Salary</th>
+              <th>New Salary</th>
+              <th>Effective Date</th>
+              <th>Reason</th>
+              <th>Updated By</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {{#each salaryHistories}}
+              <tr>
+                <td>{{previousSalary}}</td>
+                <td>{{newSalary}}</td>
+                <td>{{effectiveDate}}</td>
+                <td>{{reason}}</td>
+                <td>{{updatedBy}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+    {{else}}
+      <p class="muted">No salary history records found.</p>
+    {{/if}}
+
+    <hr>
+
+    <h2>Employment Status History</h2>
+
+    {{#if employmentStatusHistories.length}}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Previous Status</th>
+              <th>New Status</th>
+              <th>Effective Date</th>
+              <th>Reason</th>
+              <th>Updated By</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {{#each employmentStatusHistories}}
+              <tr>
+                <td>{{previousStatus}}</td>
+                <td>{{newStatus}}</td>
+                <td>{{effectiveDate}}</td>
+                <td>{{reason}}</td>
+                <td>{{updatedBy}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+    {{else}}
+      <p class="muted">No employment status history records found.</p>
+    {{/if}}
+
+  </section>
+
+</main>
+
+{{> footer}}
